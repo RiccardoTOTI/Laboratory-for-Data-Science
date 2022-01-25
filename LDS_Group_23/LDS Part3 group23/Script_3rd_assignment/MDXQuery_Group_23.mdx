@@ -1,0 +1,35 @@
+--1. SHOW THE PERCENTAGE INCREASE IN WINNNER RANK POINTS WITH RESPECT TO THE PREVIOUS YEAR
+
+with member prev_rank as
+(PARALLELPERIOD([Tournament].[Time].[Year],1,[Tournament].[Time].currentmember),[Measures].[Winner Rank Points])
+member perc as
+iif(prev_rank = null, null, ([Measures].[Winner Rank Points]-prev_rank)/prev_rank),
+format_string="percent"
+select {[Measures].[Winner Rank Points],prev_rank,perc} on columns,
+nonempty(([Tournament].[Time].[Year],[Winner].[Name].[Name])) on rows
+from [Group 23 DB]
+where ({[Tournament].[Year].&[2017],[Tournament].[Year].&[2018],[Tournament].[Year].&[2019],[Tournament].[Year].&[2020],[Tournament].[Year].&[2021]}); --questa serve per renderla più leggibile, poichè togliamo il 2016
+
+--2 FOR EACH COUNTRY SHOW THE TOTAL WINNER RANK POINTS IN PERCENTAGE WITH RESPECT TO THE TOTAL WINNER RANK POINTS OF THE CORRESPONDING CONTINENT
+
+with member prev_rank as
+([Winner].[Geography].currentmember.parent,[Measures].[Winner Rank Points])
+member perc as
+iif(prev_rank = null, null, [Measures].[Winner Rank Points]/prev_rank),
+format_string="percent"
+select {[Measures].[Winner Rank Points],prev_rank,perc} on columns,
+nonempty([Winner].[Geography].[Country Ioc]) on rows
+from [Group 23 DB];
+
+--3. SHOW THE LOSERS HAVING A TOTAL LOSER RANK POINTS GREATER THAN 10% OF THE TOTALS LOSER RANK POINTS IN EACH CONTINENT BY CONTINENT AND YEAR
+
+
+with member tot_rank as
+([Loser].[Name].[All],[Measures].[Loser Rank Points])
+member perc as
+[Measures].[Loser Rank Points]/tot_rank,
+format_string="percent"
+select {[Measures].[Loser Rank Points],tot_rank,perc} on columns,
+filter(generate(([Loser].[Continent].[Continent],[Tournament].[Year].[Year]),([Loser].[Continent].currentmember,[Tournament].[Year].currentmember,[Loser].[Name].[Name])),perc>0.1) on rows
+from [Group 23 DB];
+

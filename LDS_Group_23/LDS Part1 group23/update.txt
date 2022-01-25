@@ -1,0 +1,19 @@
+Rispetto alla prima consegna del first assignment sono state apportate le seguenti correzioni:
+
+- abbiamo risolto alcuni codici relativi al country IOC che abbiamo aggiunto alla nostra tabella. Alcune nazioni hanno cambiato il proprio codice IOC, avendo imputato i codici da un unico file è stao necessario risolvere queste mancanze e disambiguazioni. Es. abbiamo fatto un UPDATE tramite SQL per modificare l'IOC sbagliato di un giocatore italiano che aveva riportato come codice ITF anzichè ITA. 
+
+
+- sono state rilevate delle incongruenze tra il player id e il nome di alcuni loser. Per esempio la giocatrice 'Burylo' non compariva in un match in cui aveva perso ma il suo id era all'interno della tabella. Abbiamo perciò risolto imputando in SQL l'id corretto. 
+
+UPDATE Match
+SET loser_id=222066
+WHERE match_id='10-2019-W-ITF-NOR-02A-2019'
+
+
+- abbiamo inoltre risolto, sempre tramite un INSERT in SQL, i dati e l'id corretto della tennista 'Zere Islakova'. Tramite il nome del torneo e del match disputato con una ricerca manuale sul sito dell'ATP, abbiamo risolto la mancanza dei dati mancanti associati al'id. 
+
+
+INSERT INTO player (player_id, country_ioc, name, sex, hand, ht, year_of_birth)
+VALUES ('222943', 'KAZ', 'Zere Iskakova', 'F', '', 'U','2002');
+
+
